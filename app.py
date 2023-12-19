@@ -6,12 +6,14 @@ import json
 
 app = Flask(__name__)
 
+
 receivers = {
-    "RX1": {"url": "http://10.0.101.109/data.xml", "data": {}},
-    "RX2": {"url": "http://10.0.101.110/data.xml", "data": {}},
-    "RX3": {"url": "http://10.0.101.111/data.xml", "data": {}},
-    "RX4": {"url": "http://10.0.101.112/data.xml", "data": {}}
+    "RX1": {"url": "http://10.0.101.109/data.xml", "data": {}, "graph_settings": {"thresholds": [{"value": 10, "color": "#FF0000"}, {"value": 20, "color": "#FFFF00"}]}},
+    "RX2": {"url": "http://10.0.101.110/data.xml", "data": {}, "graph_settings": {"thresholds": [{"value": 10, "color": "#FF0000"}, {"value": 20, "color": "#FFFF00"}]}},
+    "RX3": {"url": "http://10.0.101.111/data.xml", "data": {}, "graph_settings": {"thresholds": [{"value": 10, "color": "#FF0000"}, {"value": 20, "color": "#FFFF00"}]}},
+    "RX4": {"url": "http://10.0.101.112/data.xml", "data": {}, "graph_settings": {"thresholds": [{"value": 10, "color": "#FF0000"}, {"value": 20, "color": "#FFFF00"}]}},
 }
+
 
 def save_to_file():
     with open('receiver_settings.json', 'w') as f:
@@ -108,13 +110,36 @@ def get_data():
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     if request.method == 'POST':
+        print("Received POST data:")
+        print(request.form)  # Print the entire form data
+
         for key in receivers:
+            # Check if the specific receiver should be updated
             if request.form.get(f'{key}_update') == 'yes':
+                # Update IP address
                 full_ip = request.form.get(f'{key}_ip')
-                receivers[key]['url'] = f'http://{full_ip}/data.xml'
+                if full_ip:  # Ensure there is an IP address provided
+                    receivers[key]['url'] = f'http://{full_ip}/data.xml'
+
+                # Update graph settings
+                threshold_settings = []
+                for i in range(1, 6):  # Assuming a maximum of 5 thresholds
+                    threshold = request.form.get(f'{key}_threshold_{i}')
+                    color = request.form.get(f'{key}_color_{i}')
+                    if threshold and color:
+                        threshold_settings.append({
+                            "value": int(threshold),
+                            "color": color
+                        })
+
+                # Only update thresholds if there are any
+                if threshold_settings:
+                    receivers[key]['graph_settings']['thresholds'] = threshold_settings
+
         save_to_file()
         return redirect(url_for('settings'))
     return render_template('settings.html', receivers=receivers)
+
 
 
 if __name__ == '__main__':
