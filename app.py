@@ -59,6 +59,13 @@ def MER_4(MER4):
         if page.find('name').text == 'DB_DEMOD_MER_4':
             return round(float(page.find('value').text))
 
+"""       
+def TRIAX_MODE(TRIAXMODE):
+    for page in TRIAXMODE.findall('parameter'):
+        if page.find('name').text == '':
+            return round(float(page.find('value').text))
+
+"""
 def retrieve_data(receiver_key):
     try:
         with urlopen(receivers[receiver_key]["url"], timeout=0.5) as d:
@@ -103,11 +110,12 @@ def settings():
     if request.method == 'POST':
         for key in receivers:
             if request.form.get(f'{key}_update') == 'yes':
-                ip_ending = request.form.get(f'{key}_url')
-                receivers[key]['url'] = f'http://10.0.101.{ip_ending}/data.xml'
+                full_ip = request.form.get(f'{key}_ip')
+                receivers[key]['url'] = f'http://{full_ip}/data.xml'
         save_to_file()
         return redirect(url_for('settings'))
     return render_template('settings.html', receivers=receivers)
+
 
 if __name__ == '__main__':
     scheduler = BackgroundScheduler()
