@@ -10,38 +10,40 @@
     <form action="/settings" method="post">
         <div class="row">
             {% for key, receiver in receivers.items() %}
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ key }}_ip">Receiver {{ key }} Full IP Address:</label>
-                    <input type="text" class="form-control" id="{{ key }}_ip" name="{{ key }}_ip" value="{{ receiver.url.split('//')[1].split('/')[0] }}">
-
-                    <h5>Graph Settings:</h5>
-                    <p>Lets add some colours to our graph. Choose a MER DB value for the colour to change.</p>
-                    <div id="graph-settings-{{ key }}">
-                        {% for i in range(1, 4) %}
-                        <div class="form-row align-items-center">
-                            <div class="col-auto">
-                                <label for="{{ key }}_threshold_{{ i }}">MER DB Threshold {{ i }}:</label>
-                                <input type="number" class="form-control mb-2" id="{{ key }}_threshold_{{ i }}" name="{{ key }}_threshold_{{ i }}" placeholder="Value">
-                            </div>
-                            <div class="col-auto">
-                                <label for="{{ key }}_color_{{ i }}">Color:</label>
-                                <input type="color" class="form-control form-control-color mb-2" id="{{ key }}_color_{{ i }}" name="{{ key }}_color_{{ i }}">
-                            </div>
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Receiver {{ key }}</h5>
+                        <div class="form-group">
+                            <label for="{{ key }}_ip">Full IP Address:</label>
+                            <input type="text" class="form-control" id="{{ key }}_ip" name="{{ key }}_ip" value="{{ receiver.url.split('//')[1].split('/')[0] }}">
                         </div>
-                        {% endfor %}
-                    </div>
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="addSetting('{{ key }}')">Add Setting</button>
-
-                    <div class="form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="{{ key }}_update" name="{{ key }}_update" value="yes">
-                        <label class="form-check-label" for="{{ key }}_update">Update this receiver</label>
+                        <h6>Graph Settings:</h6>
+                        <div id="graph-settings-{{ key }}">
+                            {% for threshold in receiver.graph_settings.thresholds %}
+                            <div class="form-row align-items-center">
+                                <div class="col">
+                                    <label for="{{ key }}_threshold_{{ loop.index }}">MER DB Threshold {{ loop.index }}:</label>
+                                    <input type="number" class="form-control mb-2" id="{{ key }}_threshold_{{ loop.index }}" name="{{ key }}_threshold_{{ loop.index }}" value="{{ threshold.value }}" placeholder="Value">
+                                </div>
+                                <div class="col">
+                                    <label for="{{ key }}_color_{{ loop.index }}">Color:</label>
+                                    <input type="color" class="form-control form-control-color mb-2" id="{{ key }}_color_{{ loop.index }}" name="{{ key }}_color_{{ loop.index }}" value="{{ threshold.color }}">
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="addSetting('{{ key }}')">Add Setting</button>
+                        <div class="form-check mb-3 mt-2">
+                            <input type="checkbox" class="form-check-input" id="{{ key }}_update" name="{{ key }}_update" value="yes">
+                            <label class="form-check-label" for="{{ key }}_update">Update this receiver</label>
+                        </div>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
-        <button type="submit" class="btn btn-primary">Update Selected</button>
+        <button type="submit" class="btn btn-primary mt-3">Update Selected</button>
     </form>
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -54,19 +56,18 @@
 
         if (currentSettings < 5) {
             let settingNumber = currentSettings + 1;
-            let newSettingHtml = `
-                <div class="form-row align-items-center">
-                    <div class="col-auto">
-                        <label for="${receiverKey}_threshold_${settingNumber}">Threshold ${settingNumber}:</label>
-                        <input type="number" class="form-control mb-2" id="${receiverKey}_threshold_${settingNumber}" name="${receiverKey}_threshold_${settingNumber}" placeholder="Value">
-                    </div>
-                    <div class="col-auto">
-                        <label for="${receiverKey}_color_${settingNumber}">Color:</label>
-                        <input type="color" class="form-control form-control-color mb-2" id="${receiverKey}_color_${settingNumber}" name="${receiverKey}_color_${settingNumber}">
-                    </div>
+            let newSettingRow = document.createElement('div');
+            newSettingRow.className = 'form-row align-items-center';
+            newSettingRow.innerHTML = `
+                <div class="col">
+                    <label for="${receiverKey}_threshold_${settingNumber}">MER DB Threshold ${settingNumber}:</label>
+                    <input type="number" class="form-control mb-2" id="${receiverKey}_threshold_${settingNumber}" name="${receiverKey}_threshold_${settingNumber}" placeholder="Value">
+                </div>
+                <div class="col">
+                    <label for="${receiverKey}_color_${settingNumber}">Color:</label>
+                    <input type="color" class="form-control form-control-color mb-2" id="${receiverKey}_color_${settingNumber}" name="${receiverKey}_color_${settingNumber}">
                 </div>`;
-
-            settingsContainer.innerHTML += newSettingHtml;
+            settingsContainer.appendChild(newSettingRow);
         } else {
             alert('Maximum of 5 settings reached.');
         }
