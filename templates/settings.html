@@ -18,22 +18,6 @@
                             <label for="{{ key }}_ip">Full IP Address:</label>
                             <input type="text" class="form-control" id="{{ key }}_ip" name="{{ key }}_ip" value="{{ receiver.url.split('//')[1].split('/')[0] }}">
                         </div>
-                        <h6>Graph Settings:</h6>
-                        <div id="graph-settings-{{ key }}">
-                            {% for threshold in receiver.graph_settings.thresholds %}
-                            <div class="form-row align-items-center">
-                                <div class="col">
-                                    <label for="{{ key }}_threshold_{{ loop.index }}">MER DB Threshold {{ loop.index }}:</label>
-                                    <input type="number" class="form-control mb-2" id="{{ key }}_threshold_{{ loop.index }}" name="{{ key }}_threshold_{{ loop.index }}" value="{{ threshold.value }}" placeholder="Value">
-                                </div>
-                                <div class="col">
-                                    <label for="{{ key }}_color_{{ loop.index }}">Color:</label>
-                                    <input type="color" class="form-control form-control-color mb-2" id="{{ key }}_color_{{ loop.index }}" name="{{ key }}_color_{{ loop.index }}" value="{{ threshold.color }}">
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="addSetting('{{ key }}')">Add Setting</button>
                         <div class="form-check mb-3 mt-2">
                             <input type="checkbox" class="form-check-input" id="{{ key }}_update" name="{{ key }}_update" value="yes">
                             <label class="form-check-label" for="{{ key }}_update">Update this receiver</label>
